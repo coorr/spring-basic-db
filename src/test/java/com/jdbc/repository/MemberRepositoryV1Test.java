@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.jdbc.connection.ConnectionConst.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,9 +29,10 @@ class MemberRepositoryV1Test {
         repository = new MemberRepositoryV1(dataSource);
 
     }
+
     @Test
     public void save_test() throws Exception {
-        Member member = new Member("memberV11", 1000);
+        Member member = new Member("memberV12", 1000);
         repository.save(member);
 
         Member byId = repository.findById(member.getMemberId());
