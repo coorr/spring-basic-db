@@ -5,34 +5,24 @@ import com.jdbc.repository.MemberRepositoryV2;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.sql.SQLException;
 
 @Slf4j
-public class MemberServiceV2_2 {
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class MemberServiceV2_3 {
 
-    private final TransactionTemplate txTemplate;
-    private final MemberRepositoryV2 memberRepository;
+    private final MemberRepositoryV2  memberRepository;
 
-    public MemberServiceV2_2(PlatformTransactionManager transactionManager, MemberRepositoryV2 memberRepository) {
-        this.txTemplate = new TransactionTemplate(transactionManager);
-        this.memberRepository = memberRepository;
-    }
-
+    @Transactional
     public void accountTransfer(String fromId, String toId, int money) throws
             SQLException {
-        txTemplate.executeWithoutResult((status) -> {
-            try {
-                //비즈니스 로직
-                bizLogic(fromId, toId, money);
-            } catch (SQLException e) {
-                throw new IllegalStateException(e);
-            }
-        });
+        bizLogic(fromId, toId, money);
     }
+
     private void bizLogic(String fromId, String toId, int
             money) throws SQLException {
         Member fromMember = memberRepository.findById(fromId);
@@ -41,6 +31,7 @@ public class MemberServiceV2_2 {
         validation(toMember);
         memberRepository.update(toId, toMember.getMoney() + money);
     }
+
     private void validation(Member toMember) {
         if (toMember.getMemberId().equals("ex")) {
             throw new IllegalStateException("이체중 예외 발생");
